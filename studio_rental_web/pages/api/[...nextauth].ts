@@ -3,9 +3,8 @@ import NextAuth, { AuthOptions} from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
-import prisma from "app/libs/prismadb"; 
 import bcrypt from "bcrypt";
-
+import prisma from "@/app/libs/prismadb"
 
 
 export const authOptions: AuthOptions = {
@@ -26,7 +25,8 @@ export const authOptions: AuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        if(credentials?.email ||credentials?.password) {
+
+        if(!credentials ||credentials?.email ||credentials?.password) {
             throw new Error('Invalid credentials')
         }
         const user = await prisma.user.findUnique({
@@ -38,12 +38,12 @@ export const authOptions: AuthOptions = {
         if (!user || !user?.hashedPassword) {
             throw new Error("Invalid credentials");
         }
-
         const isCorrectPassword = await bcrypt.compare(
-            credentials.password,
-            user.hashedPassword
-        )
+          credentials.password, 
+          user.hashedPassword
+      )
 
+      
         if (!isCorrectPassword) {
             throw new Error('Invalid credentials')
         }
@@ -62,4 +62,4 @@ export const authOptions: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
 };
 
-export default NextAuth
+export default NextAuth(authOptions);
