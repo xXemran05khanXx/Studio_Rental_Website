@@ -1,15 +1,15 @@
 import {create} from 'zustand';
 
-interface useLoginModal {
-  isopen: boolean;
+interface LoginModalStore {
+  isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
 }
 
-const useLoginModal = create<useLoginModal>((set) => ({
-  isopen: false,
-  onOpen: () => set({ isopen: true }),
-  onClose: () => set({ isopen: false }),
+const useLoginModal = create<LoginModalStore>((set) => ({
+  isOpen: false,
+  onOpen: () => set({ isOpen: true }),
+  onClose: () => set({ isOpen: false }),
 }));
 
 export default useLoginModal;
