@@ -1,16 +1,17 @@
 'use client'
 import Container from "@/app/components/Container";
-import { Reservation } from "@prisma/client"
-import { SafeListing, SafeUser } from "@/app/types"
+
+import { SafeListing, SafeReservation, SafeUser } from "@/app/types"
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { categories } from "@/app/components/navbar/Categories";
 import ListingHead from "@/app/components/listings/ListingHead";
 import ListingInfo from "@/app/components/listings/ListingInfo";
 import useLoginModal from "@/app/hooks/useLoginModal"
 import { useRouter } from "next/navigation";
-import {differenceInCalendarDays,eachDayOfInterval} from 'date-fns';
+import {differenceInDays,eachDayOfInterval} from 'date-fns';
 import axios from "axios";
 import toast from "react-hot-toast";
+import {Range} from "react-date-range"
 import ListingReservation from "@/app/components/listings/ListingReservation";
 
 
@@ -21,7 +22,7 @@ const initialDataRange = {
 };
 
 interface ListingClientProps {
-  reservations?: Reservation[];
+  reservations?: SafeReservation[];
     listing: SafeListing & {
     user: SafeUser;
   };
@@ -53,7 +54,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalPrice, setTotalPrice] = useState(listing.price);
-  const [dateRange, setDateRange] = useState(initialDataRange);
+  const [dateRange, setDateRange] = useState<Range>(initialDataRange);
 
   const onCreateReservation = useCallback(()=> {
     if (! currentUser) {
@@ -88,14 +89,14 @@ const ListingClient: React.FC<ListingClientProps> = ({
   ]);
 
   useEffect(()=>{
-    if(dateRange.startDate && dateRange.endDate ) {
-      const dayCount = Math.abs(differenceInCalendarDays(dateRange.startDate, dateRange.endDate));
-
+    if (dateRange.startDate && dateRange.endDate) {
       
-      if(dayCount && listing.price) {
-       setTotalPrice(dayCount * listing.price);
+      const dayCount = differenceInDays(dateRange.endDate, dateRange.startDate) + 1;
+      
+      if (dayCount > 0 && listing.price) {
+        setTotalPrice(dayCount * listing.price);
       } else {
-        setTotalPrice(listing.price);
+        setTotalPrice(listing.price); 
       }
     }
   },[dateRange,listing.price]);
