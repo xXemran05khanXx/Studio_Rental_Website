@@ -28,8 +28,8 @@ const TripsClient: React.FC<TripsClientProps> = ({
         toast.success("Cancelled Reservation");
         router.refresh();
      })
-     .catch((error) => {
-        toast.error("error?.response?.data?.error");
+     .catch(() => {
+        toast.error("An error occurred while cancelling the reservation.");
      })
      .finally(()=>{
         setDeletingId('');
